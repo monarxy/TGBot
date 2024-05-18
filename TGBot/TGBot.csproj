@@ -16,7 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspose.Drawing" Version="24.5.0" />
+    <PackageReference Include="ImageResizer" Version="4.2.8" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
     <PackageReference Include="Telegram.Bot" Version="18.0.0" />
   </ItemGroup>
 
