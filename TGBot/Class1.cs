@@ -19,42 +19,37 @@ namespace TGBot
 {
     class Program
     {  
-        // Это клиент для работы с Telegram Bot API, который позволяет отправлять сообщения, управлять ботом, подписываться на обновления и многое другое.
         private static ITelegramBotClient _botClient;
-
-        // Это объект с настройками работы бота. Здесь мы будем указывать, какие типы Update мы будем получать, Timeout бота и так далее.
         private static ReceiverOptions _receiverOptions;
 
         static async Task Main()
         {
-            _botClient = new TelegramBotClient("6914596505:AAERAgPqNp296VGflNahA3dGjv69uQHverk"); // Присваиваем нашей переменной значение, в параметре передаем Token, полученный от BotFather
-            _receiverOptions = new ReceiverOptions // Также присваем значение настройкам бота
+            _botClient = new TelegramBotClient("6914596505:AAERAgPqNp296VGflNahA3dGjv69uQHverk"); 
+            _receiverOptions = new ReceiverOptions 
             {
-                AllowedUpdates = new[] // Тут указываем типы получаемых Update`ов, о них подробнее расказано тут https://core.telegram.org/bots/api#update
+                AllowedUpdates = new[] 
                 {
-                UpdateType.Message, // Сообщения (текст, фото/видео, голосовые/видео сообщения и т.д.)
+                UpdateType.Message, 
             },
-                // Параметр, отвечающий за обработку сообщений, пришедших за то время, когда ваш бот был оффлайн
-                // True - не обрабатывать, False (стоит по умолчанию) - обрабаывать
+               
                 ThrowPendingUpdates = true,
             };
             using var cts = new CancellationTokenSource();
 
-            // UpdateHander - обработчик приходящих Update`ов
-            // ErrorHandler - обработчик ошибок, связанных с Bot API
-            _botClient.StartReceiving(UpdateHandler, ErrorHandler, _receiverOptions, cts.Token); // Запускаем бота
+           
+            _botClient.StartReceiving(UpdateHandler, ErrorHandler, _receiverOptions, cts.Token); 
 
-            var me = await _botClient.GetMeAsync(); // Создаем переменную, в которую помещаем информацию о нашем боте.
+            var me = await _botClient.GetMeAsync(); 
             Console.WriteLine($"{me.FirstName} запущен!");
 
-            await Task.Delay(-1); // Устанавливаем бесконечную задержку, чтобы наш бот работал постоянно
+            await Task.Delay(-1); 
         }
 
      
 
         private static Task ErrorHandler(ITelegramBotClient botClient, Exception error, CancellationToken cancellationToken)
         {
-            // Тут создадим переменную, в которую поместим код ошибки и её сообщение 
+           
             var ErrorMessage = error switch
             {
                 ApiRequestException apiRequestException
@@ -107,6 +102,8 @@ namespace TGBot
                          filePath,
                          fileStream);
                 fileStream.Close();
+                
+                System.IO.File.WriteAllText(@"C:\Паскаль\NewTGBot\TGBot\TGBot\TextFile1.txt", "");
 
                 using (StreamWriter sw = new StreamWriter(@"C:\Паскаль\NewTGBot\TGBot\TGBot\TextFile1.txt", true))
                 {
@@ -135,6 +132,7 @@ namespace TGBot
 
             if (message.Text == "Контраст")
             {
+                System.IO.File.WriteAllText(@"C:\Паскаль\NewTGBot\TGBot\TGBot\TextFile2.txt", "");
                 using (StreamWriter sw = new StreamWriter(@"C:\Паскаль\NewTGBot\TGBot\TGBot\TextFile2.txt", true))
                 {
                     await sw.WriteLineAsync($"{message.Text}");
@@ -149,50 +147,54 @@ namespace TGBot
             if (message.Text == "Сепия")
             {
                 string destinationFilePath = System.IO.File.ReadLines(@"C:\Паскаль\NewTGBot\TGBot\TGBot\TextFile1.txt").Last();
-                Console.WriteLine(destinationFilePath);
-                Bitmap bmp2 = new Bitmap(destinationFilePath);
-                for (int i = 0; i < bmp2.Width; i++)
-                    for (int j = 0; j < bmp2.Height; j++)
-                    {
-                        Color clr = bmp2.GetPixel(i, j);
-                        var oldRed = clr.R;
-                        var oldGreen = clr.R;
-                        var oldBlue = clr.R;
-
-                        var sepiaRed = Convert.ToInt32(0.393 * oldRed + 0.769 * oldGreen + 0.189 * oldBlue);
-                        var sepiaGreen = Convert.ToInt32(0.349 * oldRed + 0.686 * oldGreen + 0.168 * oldBlue);
-                        var sepiaBlue = Convert.ToInt32(0.272 * oldRed + 0.534 * oldGreen + 0.131 * oldBlue);
-
-                        if (sepiaRed > 255)
+                try
+                {
+                    Bitmap bmp2 = new Bitmap(destinationFilePath);
+                    for (int i = 0; i < bmp2.Width; i++)
+                        for (int j = 0; j < bmp2.Height; j++)
                         {
-                            sepiaRed = 255;
+                            Color clr = bmp2.GetPixel(i, j);
+                            var oldRed = clr.R;
+                            var oldGreen = clr.R;
+                            var oldBlue = clr.R;
+
+                            var sepiaRed = Convert.ToInt32(0.393 * oldRed + 0.769 * oldGreen + 0.189 * oldBlue);
+                            var sepiaGreen = Convert.ToInt32(0.349 * oldRed + 0.686 * oldGreen + 0.168 * oldBlue);
+                            var sepiaBlue = Convert.ToInt32(0.272 * oldRed + 0.534 * oldGreen + 0.131 * oldBlue);
+
+                            if (sepiaRed > 255)
+                            {
+                                sepiaRed = 255;
+                            }
+
+                            if (sepiaGreen > 255)
+                            {
+                                sepiaGreen = 255;
+                            }
+
+                            if (sepiaBlue > 255)
+                            {
+                                sepiaBlue = 255;
+                            }
+                            clr = Color.FromArgb(clr.A, sepiaRed, sepiaGreen, sepiaBlue);
+                            bmp2.SetPixel(i, j, clr);
                         }
 
-                        if (sepiaGreen > 255)
-                        {
-                            sepiaGreen = 255;
-                        }
-
-                        if (sepiaBlue > 255)
-                        {
-                            sepiaBlue = 255;
-                        }
-                        clr = Color.FromArgb(clr.A, sepiaRed, sepiaGreen, sepiaBlue);
-                        bmp2.SetPixel(i, j, clr);
-                    }
-
-                bmp2.Save(@"C:\Паскаль\NewTGBot\TGBot\TGBot\Doc.png", System.Drawing.Imaging.ImageFormat.Png);
-
-                await Task.Delay(5000);
-
-                await using Stream stream = System.IO.File.OpenRead(@"C:\Паскаль\NewTGBot\TGBot\TGBot\Doc.png");
-                await _botClient.SendDocumentAsync(
+                    bmp2.Save(@"C:\Паскаль\NewTGBot\TGBot\TGBot\Doc.png", System.Drawing.Imaging.ImageFormat.Png);
+                    System.IO.File.Delete(destinationFilePath);
+                    await Task.Delay(5000);
+                    
+                    await using Stream stream = System.IO.File.OpenRead(@"C:\Паскаль\NewTGBot\TGBot\TGBot\Doc.png");
+                    await _botClient.SendDocumentAsync(
                         chat.Id,
                         new InputOnlineFile(stream, "Sepia_File.png"));
-                await botClient.SendTextMessageAsync(
+                    await botClient.SendTextMessageAsync(
                        chat.Id,
                        "Для продолжения работы отправьте следующее изображение"
                        );
+                }
+                catch { await _botClient.SendTextMessageAsync(chat.Id, "Сначала отправьте картинку!"); }
+                
             }
 
             //if (message.Text == "Размытие")
@@ -210,80 +212,87 @@ namespace TGBot
 
             if (message.Text == "Ч/Б")
             {
-                string destinationFilePath = System.IO.File.ReadLines(@"C:\Паскаль\NewTGBot\TGBot\TGBot\TextFile1.txt").Last();
-                Console.WriteLine(message.Text);
-                Bitmap bmp = new Bitmap(destinationFilePath);
-                for (int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
-                    {
-                        Color clr = bmp.GetPixel(x, y);
-                        int r = clr.R;
-                        int g = clr.G;
-                        int b = clr.B;
-                        int avg = (r + g + b) / 3;
-                        Color setpix = Color.FromArgb(avg, avg, avg);
-                        bmp.SetPixel(x, y, setpix);
-                    }
-                bmp.Save(@"C:\Паскаль\NewTGBot\TGBot\TGBot\Doc.png", System.Drawing.Imaging.ImageFormat.Png);
+                try
+                {
+                    string destinationFilePath = System.IO.File.ReadLines(@"C:\Паскаль\NewTGBot\TGBot\TGBot\TextFile1.txt").Last();
+                    Bitmap bmp = new Bitmap(destinationFilePath);
+                    for (int x = 0; x < bmp.Width; x++)
+                        for (int y = 0; y < bmp.Height; y++)
+                        {
+                            Color clr = bmp.GetPixel(x, y);
+                            int r = clr.R;
+                            int g = clr.G;
+                            int b = clr.B;
+                            int avg = (r + g + b) / 3;
+                            Color setpix = Color.FromArgb(avg, avg, avg);
+                            bmp.SetPixel(x, y, setpix);
+                        }
+                    bmp.Save(@"C:\Паскаль\NewTGBot\TGBot\TGBot\Doc.png", System.Drawing.Imaging.ImageFormat.Png);
+                    System.IO.File.Delete(destinationFilePath);
+                    await Task.Delay(5000);
 
-                await Task.Delay(5000);
-
-                await using Stream stream = System.IO.File.OpenRead(@"C:\Паскаль\NewTGBot\TGBot\TGBot\Doc.png");
-                await _botClient.SendDocumentAsync(
-                        chat.Id,
-                        new InputOnlineFile(stream, "Black_File.png"));
-                await botClient.SendTextMessageAsync(
-                       chat.Id,
-                       "Для продолжения работы отправьте следующее изображение"
-                       );
+                    await using Stream stream = System.IO.File.OpenRead(@"C:\Паскаль\NewTGBot\TGBot\TGBot\Doc.png");
+                    await _botClient.SendDocumentAsync(
+                            chat.Id,
+                            new InputOnlineFile(stream, "Black_File.png"));
+                    await botClient.SendTextMessageAsync(
+                           chat.Id,
+                           "Для продолжения работы отправьте следующее изображение"
+                           );
+                }
+                catch { await _botClient.SendTextMessageAsync(chat.Id, "Сначала отправьте картинку!"); }
             }
 
 
 
             if (correct_numbers.Contains(message.Text) && System.IO.File.ReadLines(@"C:\Паскаль\NewTGBot\TGBot\TGBot\TextFile2.txt").Last() == "Контраст")
             {
-                string destinationFilePath = System.IO.File.ReadLines(@"C:\Паскаль\NewTGBot\TGBot\TGBot\TextFile1.txt").Last();
-               // Console.WriteLine(destinationFilePath);
-                Console.WriteLine(message.Text);
-                var number_of_contrast = int.Parse(message.Text);
+                try
+                {
+                    string destinationFilePath = System.IO.File.ReadLines(@"C:\Паскаль\NewTGBot\TGBot\TGBot\TextFile1.txt").Last();
+                    var number_of_contrast = int.Parse(message.Text);
 
-                Bitmap bmp2 = new Bitmap(destinationFilePath);
-                for (int i = 0; i < bmp2.Width; i++)
-                    for (int j = 0; j < bmp2.Height; j++)
-                    {
-                        Color clr = bmp2.GetPixel(i, j);
-                        double C = ((100.0 + number_of_contrast - 100) / 100) * ((100.0 + number_of_contrast - 100) / 100);
+                    Bitmap bmp2 = new Bitmap(destinationFilePath);
+                    for (int i = 0; i < bmp2.Width; i++)
+                        for (int j = 0; j < bmp2.Height; j++)
+                        {
+                            Color clr = bmp2.GetPixel(i, j);
+                            double C = ((100.0 + number_of_contrast - 100) / 100) * ((100.0 + number_of_contrast - 100) / 100);
 
-                        double temp = ((((clr.R / 255.0) - 0.5) * C) + 0.5) * 255.0;
-                        int nr = (int)temp;
-                        temp = ((((clr.R / 255.0) - 0.5) * C) + 0.5) * 255.0;
-                        int ng = (int)temp;
-                        temp = ((((clr.R / 255.0) - 0.5) * C) + 0.5) * 255.0;
-                        int nb = (int)temp;
+                            double temp = ((((clr.R / 255.0) - 0.5) * C) + 0.5) * 255.0;
+                            int nr = (int)temp;
+                            temp = ((((clr.R / 255.0) - 0.5) * C) + 0.5) * 255.0;
+                            int ng = (int)temp;
+                            temp = ((((clr.R / 255.0) - 0.5) * C) + 0.5) * 255.0;
+                            int nb = (int)temp;
 
-                        if (nr < 0) { nr = 0; }
-                        if (nr > 255) { nr = 255; }
-                        if (ng < 0) { ng = 0; }
-                        if (ng > 255) { ng = 255; }
-                        if (nb < 0) { nb = 0; }
-                        if (nb > 255) { nb = 255; }
+                            if (nr < 0) { nr = 0; }
+                            if (nr > 255) { nr = 255; }
+                            if (ng < 0) { ng = 0; }
+                            if (ng > 255) { ng = 255; }
+                            if (nb < 0) { nb = 0; }
+                            if (nb > 255) { nb = 255; }
 
-                        bmp2.SetPixel(i, j, Color.FromArgb(clr.A, nr, ng, nb));
+                            bmp2.SetPixel(i, j, Color.FromArgb(clr.A, nr, ng, nb));
 
-                    }
+                        }
 
-                bmp2.Save(@"C:\Паскаль\NewTGBot\TGBot\TGBot\Doc.png", System.Drawing.Imaging.ImageFormat.Png);
 
-                await Task.Delay(5000);
+                    bmp2.Save(@"C:\Паскаль\NewTGBot\TGBot\TGBot\Doc.png", System.Drawing.Imaging.ImageFormat.Png);
+                    System.IO.File.Delete(destinationFilePath);
 
-                await using Stream stream = System.IO.File.OpenRead(@"C:\Паскаль\NewTGBot\TGBot\TGBot\Doc.png");
-                await _botClient.SendDocumentAsync(
-                        chat.Id,
-                        new InputOnlineFile(stream, "Contrast_File.png"));
-                await botClient.SendTextMessageAsync(
-                       chat.Id,
-                       "Для продолжения работы отправьте следующее изображение"
-                       );
+                    await Task.Delay(5000);
+
+                    await using Stream stream = System.IO.File.OpenRead(@"C:\Паскаль\NewTGBot\TGBot\TGBot\Doc.png");
+                    await _botClient.SendDocumentAsync(
+                            chat.Id,
+                            new InputOnlineFile(stream, "Contrast_File.png"));
+                    await botClient.SendTextMessageAsync(
+                           chat.Id,
+                           "Для продолжения работы отправьте следующее изображение"
+                           );
+                }
+                catch { await _botClient.SendTextMessageAsync(chat.Id, "Сначала отправьте картинку!"); }
             }
 
             //TODO
